@@ -10,10 +10,13 @@ class MainMenu : public QWidget {
 
 public:
     MainMenu(QWidget *parent = nullptr);
-
+    void handleTrackStart(int trackId);
 public slots:
     void applyTheme(int themeIndex, bool isFullScreen = false);
     void openSettings();
+
+private slots:
+    void exitApplication();
 
 signals:
     void startGame(int trackId);
@@ -29,6 +32,7 @@ private:
     QPushButton* track1Button;
     QPushButton* track2Button;
     QPushButton* track3Button;
+    QPushButton* exitButton;
 };
 
 #endif // MAINMENU_H

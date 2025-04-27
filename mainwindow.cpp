@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     setMinimumSize(1024, 768);
 
     // Apply saved theme
-    QSettings settings("MyCompany", "RhythmRunner");
+    QSettings settings("Dashlar", "Geometry_Dashlar");
     applyTheme(settings.value("theme", 0).toInt());
 }
 
@@ -49,11 +49,11 @@ void MainWindow::startGame(int trackId) {
 
 void MainWindow::returnToMenu() {
     stackedWidget->setCurrentWidget(menu);
-    QSettings settings("MyCompany", "RhythmRunner");
+    QSettings settings("Geometry_Dashlar", "Geometry_Dashlar");
     applyTheme(settings.value("theme", 0).toInt());
 }
 
 void MainWindow::updateDisplayMode(bool isFullScreen) {
-    QSettings settings("MyCompany", "RhythmRunner");
+    QSettings settings("Geometry_Dashlar", "Geometry_Dashlar");
     menu->applyTheme(settings.value("theme", 0).toInt(), isFullScreen);
 }

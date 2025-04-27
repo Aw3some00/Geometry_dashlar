@@ -154,13 +154,13 @@ void NeonCityTrack::spawnObstacle(int gameTime, int &obstacleSpawnTimer) {
 
 qreal NeonCityTrack::getAudioAmplitude(int timer) {
     int seconds = timer / 60;
-    if (seconds < 30) return 0.4; // Вступление: достаточно для Regular и Spike
-    else if (seconds < 90) return 0.7; // Куплет: достаточно для MovingPlatform и Spike
-    else if (seconds < 150) return 0.9; // Припев: достаточно для Sawblade и Regular
-    else if (seconds < 180) return 0.5; // Спад: достаточно для JumpPad
-    else return 0.8; // Финал: достаточно для TeleportPortal и Spike
+    if (seconds < 30) return 0.4; // Вступление
+    else if (seconds < 90) return 0.7; // Куплет
+    else if (seconds < 150) return 0.9; // Припев
+    else if (seconds < 180) return 0.5; // Спад
+    else return 0.8; // Финал
 }
 
 int NeonCityTrack::getSpawnInterval() const {
-    return 30; // 0.5 секунды при 60 FPS
+    return 34; // 0.51 секунды при 60 FPS
 }

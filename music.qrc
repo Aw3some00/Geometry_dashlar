@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
-        <file>neoncity.mp3</file>
+    <qresource prefix="/music">
+        <file>neoncity.wav</file>
     </qresource>
 </RCC>

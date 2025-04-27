@@ -1,6 +1,7 @@
 #include "mainmenu.h"
 #include "settingsdialog.h"
 #include <QPushButton>
+#include "gamescene.h"
 #include <QSettings>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -10,7 +11,7 @@
 MainMenu::MainMenu(QWidget *parent) : QWidget(parent) {
     theme = new Theme();
     setupUi();
-    QSettings settings("MyCompany", "RhythmRunner");
+    QSettings settings("MyCompany", "Geometry_Dashlar");
     applyTheme(settings.value("theme", 0).toInt());
 }
 
@@ -35,7 +36,7 @@ void MainMenu::setupUi() {
     mainLayout->addLayout(topLayout);
 
     // Title
-    titleLabel = new QLabel("Rhythm Runner", this);
+    titleLabel = new QLabel("Geometry_Dashlar", this);
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
 
@@ -46,7 +47,13 @@ void MainMenu::setupUi() {
 
     // Track buttons
     track1Button = createStyledButton("Neon City", 0);
-    connect(track1Button, &QPushButton::clicked, this, [this]() { emit startGame(1); });
+    connect(track1Button, &QPushButton::clicked, this, [this]() {
+        emit startGame(1);
+    // Непосредственный запуск музыки
+    });
+
+    // Обработчик трека
+
     mainLayout->addWidget(track1Button, 0, Qt::AlignCenter);
 
     track2Button = createStyledButton("Track 2: Coming Soon", 0);
@@ -74,6 +81,8 @@ void MainMenu::setupUi() {
 
     mainLayout->addLayout(bottomLayout); // Add bottom layout to main layout
 }
+
+
 
 QPushButton* MainMenu::createStyledButton(const QString& text, int themeIndex) {
     QPushButton* button = new QPushButton(text, this);
