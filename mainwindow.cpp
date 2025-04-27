@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     stackedWidget->setCurrentWidget(menu);
 
     // Window settings
-    setMinimumSize(800, 600);
+    setMinimumSize(1024, 768);
 
     // Apply saved theme
     QSettings settings("MyCompany", "RhythmRunner");

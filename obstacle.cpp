@@ -7,7 +7,7 @@
 Obstacle::Obstacle(Type type, QGraphicsItem *parent) : QGraphicsRectItem(parent), type(type) {
     switch (type) {
     case Regular:
-        setRect(0, 0, 60, 20);
+        setRect(0, 0, 40, 60);
         setBrush(QBrush(Qt::red));
         isSafe = true;
         break;
@@ -16,18 +16,21 @@ Obstacle::Obstacle(Type type, QGraphicsItem *parent) : QGraphicsRectItem(parent)
         setRect(0, 0, 60, 20);
         setBrush(QBrush(Qt::green));
         verticalSpeed = 2;
+        isSafe=false;
         break;
 
     case Sawblade: {
         QGraphicsEllipseItem *blade = new QGraphicsEllipseItem(0, 0, 30, 30, this);
         blade->setBrush(QBrush(Qt::gray));
         setRect(0, 0, 30, 30);
+           isSafe=false;
         break;
     }
 
     case DisappearingBlock:
         setRect(0, 0, 40, 40);
         setBrush(QBrush(Qt::magenta));
+           isSafe=false;
         break;
 
     case TeleportPortal:
@@ -35,13 +38,14 @@ Obstacle::Obstacle(Type type, QGraphicsItem *parent) : QGraphicsRectItem(parent)
         setBrush(QBrush(Qt::cyan));
         targetX = 800;
         targetY = 460;
+           isSafe=false;
         break;
 
     case Spike: {
-        QPolygonF spikePolygon;
-        spikePolygon << QPointF(15, 0) << QPointF(0, 30) << QPointF(30, 30);
-        QGraphicsPolygonItem *spike = new QGraphicsPolygonItem(spikePolygon, this);
-        spike->setBrush(QBrush(Qt::red));
+        QPolygonF spikePolygonPoints;
+        spikePolygonPoints << QPointF(15, 0) << QPointF(0, 30) << QPointF(30, 30);
+        spikePolygon = new QGraphicsPolygonItem(spikePolygonPoints, this);
+        spikePolygon->setBrush(QBrush(Qt::red));
         setRect(0, 0, 0, 0);
         break;
     }
@@ -50,23 +54,27 @@ Obstacle::Obstacle(Type type, QGraphicsItem *parent) : QGraphicsRectItem(parent)
         setRect(0, 0, 40, 10);
         setBrush(QBrush(QColor(255, 165, 0))); // Оранжевый
         jumpForce = 15;
+           isSafe=false;
         break;
 
     case GravityPortal:
         setRect(0, 0, 20, 60);
         setBrush(QBrush(Qt::yellow));
         reversesGravity = true;
+           isSafe=false;
         break;
 
     case SpeedPortal:
         setRect(0, 0, 20, 60);
         setBrush(QBrush(QColor(138, 43, 226))); // Фиолетовый
         speedChange = 1.5f;
+           isSafe=false;
         break;
 
     case BounceBlock:
         setRect(0, 0, 40, 40);
         setBrush(QBrush(QColor(0, 191, 255))); // Голубой
+           isSafe=false;
         break;
     }
 }
@@ -132,7 +140,6 @@ void Obstacle::activate() {
     }
 }
 bool Obstacle::isPortal() const {
-    return
-        type == GravityPortal ;
-
+    return type == GravityPortal || type == TeleportPortal || type == SpeedPortal;
 }
+

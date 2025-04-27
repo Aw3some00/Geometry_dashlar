@@ -12,10 +12,14 @@ public:
     void setSpeedMultiplier(qreal multiplier);
     void teleportTo(qreal x, qreal y);
     qreal verticalSpeed = 0;
+    qreal getVerticalSpeed(){return verticalSpeed;}
     void resetVerticalSpeed(){verticalSpeed=0;};
+    void setOnGround(bool on) { isOnGround = on; }
+    bool isOnGroundf() const { return isOnGround; }
+     bool isOnGround= true;
 private:
 
-    bool isOnGround = true;
+
     qreal gravity = 0.8;
     qreal speedMultiplier = 1.0;
 };

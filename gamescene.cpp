@@ -1,8 +1,7 @@
 #include "GameScene.h"
 #include <QKeyEvent>
 #include <QDebug>
-#include <QMediaPlayer>
-
+bool on=1;
 GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nullptr) {
     setSceneRect(0, 0, 800, 600);
 
@@ -48,34 +47,15 @@ GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nul
     addWidget(exitButton);
     connect(exitButton, &QPushButton::clicked, this, &GameScene::returnToMenu);
 
-    mediaPlayer = new QMediaPlayer(this);
-    mediaPlayer->setMedia(QUrl("qrc:/music/neoncity.mp3"));
-    mediaPlayer->setVolume(50);
-
+    // Setup game timer
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, &GameScene::update);
-    connect(mediaPlayer, &QMediaPlayer::mediaStatusChanged, this, &GameScene::handleMediaStatusChanged);
-    connect(mediaPlayer, &QMediaPlayer::error, this, &GameScene::handleMediaError);
-    mediaPlayer->play();
 }
 
 GameScene::~GameScene() {
     delete currentTrack;
 }
-void GameScene::handleMediaStatusChanged(QMediaPlayer::MediaStatus status) {
-    qDebug() << "Media status changed:" << status;
-    if (status == QMediaPlayer::LoadedMedia) {
-        qDebug() << "Music loaded successfully";
-    } else if (status == QMediaPlayer::PlayingState) {
-        qDebug() << "Music playback started";
-    } else if (status == QMediaPlayer::EndOfMedia) {
-        mediaPlayer->play(); // Зацикливаем воспроизведение
-    }
-}
 
-void GameScene::handleMediaError(QMediaPlayer::Error error) {
-    qDebug() << "Media error:" << error << mediaPlayer->errorString();
-}
 void GameScene::setTrack(int trackId) {
     delete currentTrack;
     currentTrack = nullptr;
@@ -89,72 +69,91 @@ void GameScene::setTrack(int trackId) {
     }
 }
 
-void GameScene::startGame() {
-    gameTimer->start(16);
-    gameTime = 0;
-    retryButton->hide();
-}
 
-void GameScene::restartGame() {
-    // Clear obstacles
-    for (auto item : items()) {
-        if (dynamic_cast<Obstacle*>(item)) {
-            removeItem(item);
-            delete item;
-        }
-    }
-    player->setPos(100, 460);
-    player->setSpeedMultiplier(1.0);
-    gameTime = 0;
-    startGame();
-}
 
-void GameScene::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Space) {
-        player->jump();
-    }
-}
 
 void GameScene::update() {
     if (!player) return;
 
+    isOnPlatform = false;
+
     player->update();
     gameTime++;
 
-    // Отладка
     qDebug() << "Game time:" << gameTime << "Timer before increment:" << obstacleSpawnTimer;
 
-    // Spawn obstacles
     if (currentTrack && obstacleSpawnTimer++ >= currentTrack->getSpawnInterval()) {
         currentTrack->spawnObstacle(gameTime, obstacleSpawnTimer);
         obstacleSpawnTimer = 0;
         qDebug() << "Timer reset to 0 after spawning";
     }
 
-    // Используем копию списка для безопасной итерации
     const auto sceneItems = items();
     for (auto item : sceneItems) {
         Obstacle* obstacle = dynamic_cast<Obstacle*>(item);
         if (!obstacle) continue;
 
-        // Двигаем препятствие
-        obstacle->setPos(obstacle->x() - 5, obstacle->y());
+        obstacle->setPos(obstacle->x() - 3, obstacle->y());
         obstacle->update();
 
-        // Проверяем столкновения
-        if (player->collidesWithItem(obstacle, Qt::IntersectsItemBoundingRect)) {
-            // Если препятствие безопасное (например, Regular), игрок может стоять на нём
+        bool collisionDetected = false;
+        if (obstacle->getType() == Obstacle::Spike) {
+            QGraphicsPolygonItem* spikePolygon = obstacle->getSpikePolygon();
+            if (spikePolygon) {
+                collisionDetected = player->collidesWithItem(spikePolygon, Qt::IntersectsItemShape);
+                qDebug() << "Checking Spike collision: Polygon valid=" << (spikePolygon != nullptr)
+                         << "Collision=" << collisionDetected
+                         << "Polygon points=" << spikePolygon->polygon()
+                         << "Spike pos: (" << obstacle->x() << "," << obstacle->y() << ")";
+            } else {
+                qDebug() << "Warning: Spike polygon is null!";
+            }
+        } else {
+            collisionDetected = player->collidesWithItem(obstacle, Qt::IntersectsItemBoundingRect);
+            qDebug() << "Checking obstacle collision: Type=" << obstacle->getType()
+                     << "Obstacle rect=" << obstacle->rect()
+                     << "Obstacle pos: (" << obstacle->x() << "," << obstacle->y() << ")"
+                     << "Player rect=" << player->rect()
+                     << "Player pos: (" << player->x() << "," << player->y() << ")";
+        }
+
+        if (collisionDetected) {
+            qDebug() << "Collision detected with obstacle type:" << obstacle->getType()
+            << "at position (" << obstacle->x() << "," << obstacle->y() << ")"
+            << "Player position (" << player->x() << "," << player->y() << ")";
+
             if (obstacle->isSafeToStandOn()) {
-                // Убедимся, что игрок падает сверху
-                if (player->y() + player->rect().height() <= obstacle->y() + 5) {
+                qreal playerBottom = player->y() + player->rect().height();
+                qreal obstacleTop = obstacle->y();
+                qDebug() << "Landing check: playerBottom=" << playerBottom
+                         << "obstacleTop=" << obstacleTop
+                         << "player->y()=" << player->y()
+                         << "condition=" << (playerBottom >= obstacleTop && player->y() <= obstacleTop + 20);
+                if (playerBottom >= obstacleTop && player->y() <= obstacleTop + 20) {
                     player->setPos(player->x(), obstacle->y() - player->rect().height());
                     player->resetVerticalSpeed();
-                    qDebug() << "Player landed on Regular at y:" << obstacle->y();
+                    player->setOnGround(true);
+                    isOnPlatform = true;
+                    qDebug() << "Player landed on Regular at y:" << obstacle->y()
+                             << "Player new pos: (" << player->x() << "," << player->y() << ")"
+                             << "isOnPlatform:" << isOnPlatform << "isOnGround:" << player->isOnGroundf();
                     continue;
                 }
+
+                qreal playerRight = player->x() + player->rect().width();
+                qreal obstacleLeft = obstacle->x();
+                if (playerRight >= obstacleLeft && player->x() < obstacleLeft) {
+                    isGameOver = true;
+                    gameTimer->stop();
+                    retryButton->show();
+                    qDebug() << "Game Over! Collided with Regular from left";
+                    return;
+                }
+
+                qDebug() << "Collided with safe obstacle (Regular) from side/bottom, ignoring";
+                continue;
             }
 
-            // Обрабатываем порталы
             if (obstacle->isPortal()) {
                 switch (obstacle->getType()) {
                 case Obstacle::TeleportPortal:
@@ -177,16 +176,13 @@ void GameScene::update() {
                 continue;
             }
 
-            // Для небезопасных препятствий (не порталов) — игра заканчивается
-            if (!obstacle->isSafeToStandOn()) {
-                gameTimer->stop();
-                retryButton->show();
-                qDebug() << "Game Over! Collided with obstacle type:" << obstacle->getType();
-                return; // Прерываем обновление
-            }
+            isGameOver = true;
+            gameTimer->stop();
+            retryButton->show();
+            qDebug() << "Game Over! Collided with obstacle type:" << obstacle->getType();
+            return;
         }
 
-        // Удаляем препятствия за пределами экрана
         if (obstacle->x() + obstacle->rect().width() < 0) {
             removeItem(obstacle);
             delete obstacle;
@@ -194,10 +190,55 @@ void GameScene::update() {
         }
     }
 
-    // Завершение трассы
     if (gameTime >= 18000) {
+        isGameOver = true;
         gameTimer->stop();
         retryButton->show();
         qDebug() << "Track Completed!";
     }
+}
+
+
+
+void GameScene::keyPressEvent(QKeyEvent *event) {
+    if (isGameOver) {
+        qDebug() << "Game is over, ignoring key press";
+        return;
+    }
+
+    if (event->key() == Qt::Key_Space) {
+        player->jump();
+        qDebug() << "Jump initiated, isOnPlatform:" << isOnPlatform;
+    } else {
+        qDebug() << "Key press ignored: key=" << event->key()
+        << "isOnPlatform=" << isOnPlatform;
+    }
+    QGraphicsScene::keyPressEvent(event);
+}
+
+void GameScene::restartGame() {
+    for (auto item : items()) {
+        if (dynamic_cast<Obstacle*>(item)) {
+            removeItem(item);
+            delete item;
+        }
+    }
+    player->setPos(100, 460);
+    player->setSpeedMultiplier(1.0);
+    player->resetVerticalSpeed();
+    player->setOnGround(true);
+    isGameOver = false;
+    isOnPlatform = false;
+    gameTime = 0;
+    obstacleSpawnTimer = 0;
+    retryButton->hide();
+    startGame();
+    qDebug() << "Game restarted, player pos: (100, 460), isOnGround: true";
+}
+
+void GameScene::startGame() {
+    if (!gameTimer->isActive()) {
+        gameTimer->start(1000 / 60);
+    }
+    qDebug() << "Game started, timer active:" << gameTimer->isActive();
 }

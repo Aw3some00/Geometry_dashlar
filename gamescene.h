@@ -5,7 +5,7 @@
 #include <QTimer>
 #include "player.h"
 #include "obstacle.h"
-#include <QMediaPlayer>
+
 #include <QPushButton>
 #include "NeonCityTrack.h"
 
@@ -16,9 +16,9 @@ public:
     ~GameScene();
     void startGame();
     void setTrack(int trackId);
-  //  QMediaPlayer *musicPlayer;
-    void handleMediaError(QMediaPlayer::Error error);
-    void handleMediaStatusChanged(QMediaPlayer::MediaStatus status);
+    bool isOnPlatform = false;
+    bool isGameOver = false;
+
 signals:
     void returnToMenu();
 
@@ -30,10 +30,9 @@ private slots:
     void restartGame();
 
 private:
-    void endGame(bool success);
+
     Player *player;
     QTimer *gameTimer;
-    QMediaPlayer *mediaPlayer;
     QPushButton *retryButton;
     QPushButton *exitButton;
     NeonCityTrack *currentTrack; // Используем NeonCityTrack напрямую

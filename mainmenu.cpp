@@ -3,13 +3,14 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QVBoxLayout>
-#include<QApplication>
-#include<QScreen>
+#include <QHBoxLayout>
+#include <QApplication>
+#include <QScreen>
 
 MainMenu::MainMenu(QWidget *parent) : QWidget(parent) {
     theme = new Theme();
     setupUi();
-    QSettings settings("MyCompany", "Geometry_dashlar");
+    QSettings settings("MyCompany", "RhythmRunner");
     applyTheme(settings.value("theme", 0).toInt());
 }
 
@@ -17,16 +18,17 @@ void MainMenu::setupUi() {
     setObjectName("MainMenu");
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignCenter);
-    mainLayout->setSpacing(30);
-    mainLayout->setContentsMargins(40, 40, 40, 40);
+    mainLayout->setContentsMargins(20, 20, 20, 20);  // Increased margins
+    mainLayout->setSpacing(25);
 
     // Top bar with settings
     QHBoxLayout* topLayout = new QHBoxLayout();
     topLayout->addStretch();
 
     settingsButton = new QPushButton("Settings", this);
-    settingsButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    settingsButton->setMinimumSize(150, 50);
+    settingsButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);  // Make size fixed
+    settingsButton->setFixedSize(40, 16);  // Smaller size
+    settingsButton->setFont(QFont("Arial", 9, QFont::Bold));  // Smaller font
     connect(settingsButton, &QPushButton::clicked, this, &MainMenu::openSettings);
     topLayout->addWidget(settingsButton);
 
@@ -55,13 +57,27 @@ void MainMenu::setupUi() {
     track3Button->setEnabled(false);
     mainLayout->addWidget(track3Button, 0, Qt::AlignCenter);
 
-    mainLayout->addStretch();
+    track1Button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    track2Button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    track3Button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+
+    // Bottom layout for exit button (aligned to the right)
+    QHBoxLayout* bottomLayout = new QHBoxLayout();
+    bottomLayout->addStretch(); // Push the exit button to the right
+
+    exitButton = new QPushButton("Exit", this);
+    exitButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    exitButton->setFixedSize(40, 16); // Smaller size
+    exitButton->setFont(QFont("Arial", 9, QFont::Bold)); // Smaller font
+    connect(exitButton, &QPushButton::clicked, this, &MainMenu::exitApplication);
+    bottomLayout->addWidget(exitButton);
+
+    mainLayout->addLayout(bottomLayout); // Add bottom layout to main layout
 }
 
 QPushButton* MainMenu::createStyledButton(const QString& text, int themeIndex) {
     QPushButton* button = new QPushButton(text, this);
     button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    button->setMinimumSize(200, 60);
     button->setStyleSheet(theme->getButtonStyle(themeIndex, window()->isFullScreen()));
     return button;
 }
@@ -78,13 +94,15 @@ void MainMenu::applyTheme(int themeIndex, bool isFullScreen) {
     track1Button->setStyleSheet(buttonStyle);
     track2Button->setStyleSheet(buttonStyle);
     track3Button->setStyleSheet(buttonStyle);
+    exitButton->setStyleSheet(buttonStyle); // Apply theme to exit button
 
     QString labelStyle = theme->getLabelStyle(themeIndex);
-    int titleFontSize = isFullScreen ? 56 : 48;
-    int trackFontSize = isFullScreen ? 28 : 24;
+    int titleFontSize = isFullScreen ? 100 : 62;
+    int trackFontSize = isFullScreen ? 95 : 54;
+
     if (QApplication::primaryScreen()->logicalDotsPerInch() > 96) {
-        titleFontSize += 4;
-        trackFontSize += 2;
+        titleFontSize += 8;
+        trackFontSize += 4;
     }
     titleLabel->setStyleSheet(QString("font-size: %1px; font-weight: bold; %2")
                                   .arg(titleFontSize)
@@ -103,4 +121,8 @@ void MainMenu::openSettings() {
     dialog.exec();
     QSettings settings("MyCompany", "RhythmRunner");
     applyTheme(settings.value("theme", 0).toInt(), window()->isFullScreen());
+}
+
+void MainMenu::exitApplication() {
+    QApplication::quit(); // Close the application
 }

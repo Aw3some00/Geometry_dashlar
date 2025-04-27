@@ -3,14 +3,13 @@
 #include <QSettings>
 #include <QMessageBox>
 #include <QDebug>
-#include <QComboBox>
 #include <QVBoxLayout>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("Settings");
     setMinimumSize(400, 300);
 
-    QSettings settings("MyCompany", "Geometry_Dashlar");
+    QSettings settings("MyCompany", "RhythmRunner");
     theme = new Theme();
 
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -27,7 +26,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     int displayMode = settings.value("displayMode", 0).toInt();
     displayModeComboBox->setCurrentIndex(displayMode);
     layout->addWidget(displayModeComboBox);
-    connect(displayModeComboBox,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SettingsDialog::updateDisplayMode);
+    connect(displayModeComboBox,
+            static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this,
+            &SettingsDialog::updateDisplayMode);
 
     // Music Volume
     QLabel* volumeLabel = new QLabel("Music Volume:", this);
@@ -49,7 +51,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     int themeIndex = settings.value("theme", 0).toInt();
     themeComboBox->setCurrentIndex(themeIndex);
     layout->addWidget(themeComboBox);
-    connect(themeComboBox,   static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SettingsDialog::updateTheme);
+    connect(displayModeComboBox,
+            static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this,
+            &SettingsDialog::updateDisplayMode);
 
     // Spacer to push buttons to the bottom
     layout->addStretch();

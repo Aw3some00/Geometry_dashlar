@@ -25,10 +25,15 @@ void Theme::applyTheme(QWidget* widget, int themeIndex, QPushButton* resetBtn, Q
 }
 
 QString Theme::getButtonStyle(int themeIndex, bool isFullScreen) const {
-    // Dynamic font size based on screen DPI and mode
-    int fontSize = isFullScreen ? 18 : 16;
+    int fontSize = isFullScreen ? 25 : 20;
+    QString padding = isFullScreen ? "15px 40px" : "12px 35px";
+    int minWidth = isFullScreen ? 500 : 280;
+    int minHeight = isFullScreen ? 40 : 30;
+
     if (QApplication::primaryScreen()->logicalDotsPerInch() > 96) {
-        fontSize += 2; // Increase for high-DPI displays
+        fontSize += 2;
+        minWidth += 40;
+        minHeight += 10;
     }
 
     QString baseStyle = QString(
@@ -36,21 +41,27 @@ QString Theme::getButtonStyle(int themeIndex, bool isFullScreen) const {
         "background: %1;"
         "color: %2;"
         "border: 2px solid %3;"
-        "border-radius: 8px;"
+        "border-radius: 10px;"
         "padding: %4;"
         "font-size: %5px;"
         "font-weight: bold;"
         "min-width: %6px;"
         "min-height: %7px;"
         "}"
-        "QPushButton:hover { background: %8; border: 2px solid %9; }"
-        "QPushButton:pressed { background: %10; }"
+        "QPushButton:hover { "
+        "   background: %8; "
+        "   border: 2px solid %9; "
+        "   padding: %4; "                // Maintain padding
+        "   transition: all 0.3s ease; "  // Smooth transition
+        "}"
+        "QPushButton:pressed { "
+        "   background: %10; "
+        "   transform: scale(0.98); "     // Subtle press effect
+        "}"
         "QPushButton:disabled { background: #666666; color: #cccccc; border: 2px solid #555555; }"
         );
 
-    QString padding = isFullScreen ? "12px 24px" : "10px 20px";
-    int minWidth = isFullScreen ? 180 : 150;
-    int minHeight = isFullScreen ? 50 : 40;
+
 
     switch (themeIndex) {
     case 0: // Dark
