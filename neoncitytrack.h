@@ -22,7 +22,7 @@ private:
     QGraphicsPixmapItem *backgroundItem; // Для хранения фона
     void setupBackground();
     void setupGround();
- QSoundEffect *musicEffect;
+    QSoundEffect *musicEffect;
     qreal getAudioAmplitude(int timer);
 };
 

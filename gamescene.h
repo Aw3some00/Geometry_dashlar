@@ -1,11 +1,11 @@
 #ifndef GAMESCENE_H
 #define GAMESCENE_H
-
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include <QGraphicsScene>
 #include <QTimer>
 #include "player.h"
-#include "obstacle.h"
-
+#include <QSoundEffect>
 #include <QPushButton>
 #include "NeonCityTrack.h"
 
@@ -18,7 +18,11 @@ public:
     void setTrack(int trackId);
     bool isOnPlatform = false;
     bool isGameOver = false;
-
+    void setupMusic();
+    void stopMusic();
+    void startMusic();
+        QSoundEffect* musicEffect;
+    QMediaPlayer *musicPlayer = nullptr;
 signals:
     void returnToMenu();
 

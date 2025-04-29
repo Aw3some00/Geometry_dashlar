@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -34,6 +34,7 @@ FORMS += \
 
 RESOURCES += music.qrc \
     nightBaku.qrc \
+    portal.qrc \
     portal.qrc
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

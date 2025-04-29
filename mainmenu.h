@@ -10,7 +10,7 @@ class MainMenu : public QWidget {
 
 public:
     MainMenu(QWidget *parent = nullptr);
-
+    void exitApplication();
 public slots:
     void applyTheme(int themeIndex, bool isFullScreen = false);
     void openSettings();
@@ -29,6 +29,7 @@ private:
     QPushButton* track1Button;
     QPushButton* track2Button;
     QPushButton* track3Button;
+    QPushButton* exitButton;
 };
 
 #endif // MAINMENU_H

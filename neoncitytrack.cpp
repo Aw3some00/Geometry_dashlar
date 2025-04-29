@@ -7,7 +7,7 @@
 #include <QRandomGenerator>
 #include <QPainter>
 #include <QPixmap>
-//#include <QSoundEffect>
+#include <QSoundEffect>
 #include <QDebug>
 
 NeonCityTrack::NeonCityTrack(QGraphicsScene *scene) : scene(scene), backgroundItem(nullptr) {
