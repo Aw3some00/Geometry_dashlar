@@ -22,7 +22,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     displayModeComboBox = new QComboBox(this);
     displayModeComboBox->addItem("Windowed");
     displayModeComboBox->addItem("Fullscreen");
-    displayModeComboBox->addItem("Borderless");
+    //displayModeComboBox->addItem("Borderless");
     int displayMode = settings.value("displayMode", 0).toInt();
     displayModeComboBox->setCurrentIndex(displayMode);
     layout->addWidget(displayModeComboBox);
@@ -51,10 +51,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     int themeIndex = settings.value("theme", 0).toInt();
     themeComboBox->setCurrentIndex(themeIndex);
     layout->addWidget(themeComboBox);
-    connect(displayModeComboBox,
-            static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this,
-            &SettingsDialog::updateDisplayMode);
+    connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateTheme);
 
     // Spacer to push buttons to the bottom
     layout->addStretch();
@@ -99,11 +96,11 @@ void SettingsDialog::updateDisplayMode(int index) {
         mainWindow->showFullScreen();
         isFullScreen = true;
         break;
-    case 2: // Borderless
+   /* case 2: // Borderless
         mainWindow->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
         mainWindow->showMaximized();
         isFullScreen = true;
-        break;
+        break;*/
     default:
         mainWindow->showNormal();
         mainWindow->resize(1280, 720);
