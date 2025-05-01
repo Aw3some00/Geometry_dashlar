@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include "gamescene.h"
 #include <QLabel>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
@@ -32,18 +33,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
             this,
             &SettingsDialog::updateDisplayMode);
 
-    // Mute/Unmute Button
-    QHBoxLayout* soundLayout = new QHBoxLayout();
-    QLabel* soundLabel = new QLabel("Sound:", this);
-    muteButton = new QPushButton("Mute", this);
-    muteButton->setCheckable(true);
-    bool isMuted = settings.value("muted", false).toBool();
-    muteButton->setChecked(isMuted);
-    muteButton->setText(isMuted ? "Unmute" : "Mute");
-    connect(muteButton, &QPushButton::clicked, this, &SettingsDialog::toggleMute);
-    soundLayout->addWidget(soundLabel);
-    soundLayout->addWidget(muteButton);
-    layout->addLayout(soundLayout);
+
 
     // Color Theme
     QLabel* themeLabel = new QLabel("Color Theme:", this);
@@ -55,7 +45,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     int themeIndex = settings.value("theme", 0).toInt();
     themeComboBox->setCurrentIndex(themeIndex);
     layout->addWidget(themeComboBox);
-    connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateTheme);
+    connect(themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &SettingsDialog::updateTheme);
 
     // Spacer to push buttons to the bottom
     layout->addStretch();
@@ -109,12 +100,7 @@ void SettingsDialog::updateDisplayMode(int index) {
     emit displayModeChanged(isFullScreen);
 }
 
-void SettingsDialog::toggleMute() {
-    QSettings settings("MyCompany", "RhythmRunner");
-    bool isMuted = muteButton->isChecked();
-    settings.setValue("muted", isMuted);
-    muteButton->setText(isMuted ? "Unmute" : "Mute");
-}
+
 
 void SettingsDialog::updateTheme(int index) {
     QSettings settings("MyCompany", "RhythmRunner");
@@ -135,12 +121,11 @@ void SettingsDialog::resetSettings() {
     settings.clear();
 
     displayModeComboBox->setCurrentIndex(0);
-    muteButton->setChecked(false);
-    muteButton->setText("Mute");
+
     themeComboBox->setCurrentIndex(0);
 
     updateDisplayMode(0);
-    toggleMute(); // Save the mute state
+
     updateTheme(0);
 
     QMessageBox::information(this, "Reset", "Settings have been reset to default.");

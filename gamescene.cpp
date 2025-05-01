@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "gamescene.h"
 #include <QKeyEvent>
 #include <QDebug>
 #include <QThread>
@@ -6,7 +7,17 @@
 #include <QAudioOutput>
 #include <QAudioOutput>
 #include <iostream>
+#include <QRandomGenerator>
+int randomIndex;
+void GameScene::restartPlayback() {
+    fon->setPosition(0);
+    QTimer::singleShot(50,fon, &QMediaPlayer::play);
+}
 
+
+int getRandomInt(int min, int max) {
+    return QRandomGenerator::global()->bounded(min, max + 1);
+}
 void GameScene::startMusic() {
     if (!musicPlayer) return;
 
@@ -28,18 +39,56 @@ void GameScene::stopMusic() {
         qDebug() << "Music stopped";
     }
 }
+void GameScene::fail() {
 
+    int randomIndex=getRandomInt(0,14);
+    faultSound->setMedia(QMediaContent(soundFiles[randomIndex]));
+    faultSound->setVolume(100);
+    faultSound->play();
+
+}
+void GameScene::failstop(){
+    faultSound->setVolume(0);
+}
+void GameScene::fonstop(){
+    fon->setVolume(0);
+}
 GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nullptr) {
 
     musicPlayer = new QMediaPlayer(this);
 
-    // Настройка плеера
+
     musicPlayer->setMedia(QMediaContent(QUrl("qrc:/neoncity.mp3")));
-    musicPlayer->setVolume(100); // Максимальная громкость (0-100)
+    musicPlayer->setVolume(100);
     if (!QFile(":/neoncity.mp3").exists()) {
         qDebug() << "ERROR: Music file not found in resources!";
         return;
     }
+    fon = new QMediaPlayer(this);
+
+
+
+    int randomIndex1=getRandomInt(0,2);
+    fon->setMedia(QMediaContent(backsounds[randomIndex1]));
+    fon->setVolume(10);
+    fon->play();
+    connect(fon, &QMediaPlayer::stateChanged, this, [this](QMediaPlayer::State state) {
+        if (state == QMediaPlayer::StoppedState || fon->mediaStatus() == QMediaPlayer::EndOfMedia) {
+            restartPlayback();
+
+        }
+    });
+
+    win=new QMediaPlayer(this);
+    win->setMedia(QMediaContent(QUrl("qrc:/congr.mp3")));
+    win->setVolume(100);
+
+    randomIndex = getRandomInt(0,14);
+
+    faultSound=new QMediaPlayer(this);
+    faultSound->setMedia(QMediaContent(QUrl(soundFiles[randomIndex])));
+    faultSound->setVolume(100);
+
 
 
     // Обработка ошибок
@@ -92,7 +141,13 @@ GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nul
         "}"
         );
     addWidget(exitButton);
-    connect(exitButton, &QPushButton::clicked, this,&GameScene::returnToMenu);
+    connect(exitButton, &QPushButton::clicked, this, [this]() {
+        returnToMenu();
+         failstop();
+        fon->setVolume(10);
+        fon->play();
+
+    });
 
 
 
@@ -198,7 +253,9 @@ void GameScene::update() {
                          << "condition=" << isLeftCollision;
 
                 if (isLeftCollision) {
+                    fail();
                     isGameOver = true;
+                    randomIndex = getRandomInt(0,14);
                     stopMusic();
                     gameTimer->stop();
                     retryButton->show();
@@ -262,6 +319,8 @@ void GameScene::update() {
             // Для всех остальных препятствий (например, Spike) — Game Over
             isGameOver = true;
             stopMusic();
+            randomIndex = getRandomInt(0,14);
+            fail();
             gameTimer->stop();
             retryButton->show();
             qDebug() << "Game Over! Collided with obstacle type:" << obstacle->getType();
@@ -275,10 +334,11 @@ void GameScene::update() {
         }
     }
 
-    if (gameTime >= 18000) {
+    if (gameTime >= 14200) {
         isGameOver = true;
         stopMusic();
         gameTimer->stop();
+        win->play();
         retryButton->show();
         qDebug() << "Track Completed!";
     }
@@ -325,6 +385,7 @@ void GameScene::restartGame() {
     retryButton->hide();
     stopMusic();
     startGame();
+    failstop();
     qDebug() << "Game restarted, player pos: (100, 460), isOnGround: true";
 }
 
@@ -340,6 +401,9 @@ void GameScene::startGame() {
     if (!gameTimer->isActive()) {
         gameTimer->start(1000 / 60);
     }
+    fonstop();
     startMusic();
     qDebug() << "Game started, timer active:" << gameTimer->isActive();
 }
+
+

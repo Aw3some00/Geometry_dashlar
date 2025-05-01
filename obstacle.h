@@ -18,7 +18,10 @@ public:
         SpeedPortal,
         BounceBlock
     };
+    float getSpeedMultiplier() const { return speedChange; }
+    void setSpeedMultiplier(float multiplier);
 
+    void setTarget(qreal x, qreal y);
     Obstacle(Type type, QGraphicsItem *parent = nullptr);
     void update();
     void activate();

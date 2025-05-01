@@ -1,5 +1,25 @@
 <RCC>
     <qresource prefix="/">
         <file>neoncity.mp3</file>
+        <file>fail.mp3</file>
+        <file>ahhhh-gachi-muchi.mp3</file>
+        <file>brazil-zil.mp3</file>
+        <file>cat-laugh-meme-1.mp3</file>
+        <file>demir-boru-dusme-sesi.mp3</file>
+        <file>directed-by-robert-b_voI2Z4T.mp3</file>
+        <file>gay-echo.mp3</file>
+        <file>goida_hRZ6vDr.mp3</file>
+        <file>gta-v-wastedbusted-gaming-sound-effect-hd.mp3</file>
+        <file>movie_1.mp3</file>
+        <file>shocked-sound-effect.mp3</file>
+        <file>spongebob-fail.mp3</file>
+        <file>troll-face-smiling.mp3</file>
+        <file>y2mate_xi2QMCt.mp3</file>
+        <file>selamun-aleykum_KlyTyfa.mp3</file>
+        <file>fon.mp3</file>
+        <file>congratulations-mp3cut.mp3</file>
+        <file>kutay_ucar_mvsn.mp3</file>
+        <file>nokia-ringtone-arabic.mp3</file>
+        <file>congr.mp3</file>
     </qresource>
 </RCC>

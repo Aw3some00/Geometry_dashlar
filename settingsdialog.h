@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QComboBox>
+#include "gamescene.h"
 #include <QPushButton>
 #include "theme.h"
 
@@ -11,10 +12,10 @@ class SettingsDialog : public QDialog {
 
 public:
     SettingsDialog(QWidget *parent = nullptr);
-
+ explicit SettingsDialog(GameScene* gameScene, QWidget *parent = nullptr);
 private slots:
     void updateDisplayMode(int index);
-    void toggleMute();
+
     void updateTheme(int index);
     void resetSettings();
 
@@ -22,10 +23,10 @@ signals:
     void displayModeChanged(bool isFullScreen);
 
 private:
+      GameScene* m_gameScene;
     Theme* theme;
     QComboBox* displayModeComboBox;
     QComboBox* themeComboBox;
-    QPushButton* muteButton; 
     QPushButton* resetButton;
     QPushButton* okButton;
 };

@@ -33,13 +33,15 @@ Obstacle::Obstacle(Type type, QGraphicsItem *parent) : QGraphicsRectItem(parent)
            isSafe=false;
         break;
 
-    case TeleportPortal:
+    case TeleportPortal: {
         setRect(0, 0, 20, 60);
-        setBrush(QBrush(Qt::cyan));
+        QGraphicsPixmapItem *portalImage = new QGraphicsPixmapItem(QPixmap(":/portal/photo_2025-04-27 23.56.18.jpeg"), this);
+        portalImage->setPos(0, 0);
+        portalImage->setScale(20.0 / portalImage->pixmap().width());
         targetX = 800;
         targetY = 460;
-           isSafe=false;
         break;
+    }
 
     case Spike: {
         QPolygonF spikePolygonPoints;
@@ -137,6 +139,17 @@ void Obstacle::activate() {
         activated = true;
         setBrush(QBrush(Qt::white));
         activationTimer = 0;
+    }
+}
+void Obstacle::setSpeedMultiplier(float multiplier) {
+    if (type == SpeedPortal) {
+        speedChange = multiplier;
+    }
+}
+void Obstacle::setTarget(qreal x, qreal y) {
+    if (type == TeleportPortal) {
+        targetX = x;
+        targetY = y;
     }
 }
 bool Obstacle::isPortal() const {
