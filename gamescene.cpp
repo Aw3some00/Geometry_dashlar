@@ -319,6 +319,14 @@ void GameScene::restartGame() {
     qDebug() << "Game restarted, player pos: (100, 460), isOnGround: true";
 }
 
+void GameScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
+    if (event->button() == Qt::LeftButton && !isGameOver) {
+        player->jump();
+        qDebug() << "Mouse jump initiated";
+    }
+    QGraphicsScene::mousePressEvent(event); 
+}
+
 void GameScene::startGame() {
     if (!gameTimer->isActive()) {
         gameTimer->start(1000 / 60);
