@@ -8,6 +8,7 @@
 #include <QSoundEffect>
 #include <QPushButton>
 #include "NeonCityTrack.h"
+#include <QGraphicsSceneMouseEvent>
 
 class GameScene : public QGraphicsScene {
     Q_OBJECT
@@ -28,6 +29,7 @@ signals:
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
 private slots:
     void update();
