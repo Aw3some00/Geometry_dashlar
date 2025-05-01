@@ -31,22 +31,22 @@ void GameScene::stopMusic() {
 
 GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nullptr) {
 
-        musicPlayer = new QMediaPlayer(this);
+    musicPlayer = new QMediaPlayer(this);
 
-        // Настройка плеера
-        musicPlayer->setMedia(QMediaContent(QUrl("qrc:/neoncity.mp3")));
-        musicPlayer->setVolume(100); // Максимальная громкость (0-100)
-        if (!QFile(":/neoncity.mp3").exists()) {
-            qDebug() << "ERROR: Music file not found in resources!";
-            return;
-        }
+    // Настройка плеера
+    musicPlayer->setMedia(QMediaContent(QUrl("qrc:/neoncity.mp3")));
+    musicPlayer->setVolume(100); // Максимальная громкость (0-100)
+    if (!QFile(":/neoncity.mp3").exists()) {
+        qDebug() << "ERROR: Music file not found in resources!";
+        return;
+    }
 
 
-        // Обработка ошибок
-        connect(musicPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error),
-                [](QMediaPlayer::Error error) {
-                    qDebug() << "Music error:" << error;
-                });
+    // Обработка ошибок
+    connect(musicPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error),
+            [](QMediaPlayer::Error error) {
+                qDebug() << "Music error:" << error;
+            });
 
 
     setSceneRect(0, 0, 800, 600);
@@ -300,7 +300,7 @@ void GameScene::keyPressEvent(QKeyEvent *event) {
         event->accept(); // Mark event as handled
     } else {
         qDebug() << "Key press ignored: key=" << event->key()
-                 << "isOnPlatform=" << isOnPlatform;
+        << "isOnPlatform=" << isOnPlatform;
     }
     // Only propagate unhandled events
     if (!event->isAccepted()) {
@@ -333,7 +333,7 @@ void GameScene::mousePressEvent(QGraphicsSceneMouseEvent* event) {
         player->jump();
         qDebug() << "Mouse jump initiated";
     }
-    QGraphicsScene::mousePressEvent(event); 
+    QGraphicsScene::mousePressEvent(event);
 }
 
 void GameScene::startGame() {
@@ -343,4 +343,3 @@ void GameScene::startGame() {
     startMusic();
     qDebug() << "Game started, timer active:" << gameTimer->isActive();
 }
-

@@ -16,6 +16,7 @@ SOURCES += \
     neoncitytrack.cpp \
     obstacle.cpp \
     player.cpp \
+    gamewindow.cpp\
     settingsdialog.cpp \
     theme.cpp
 
@@ -26,6 +27,7 @@ HEADERS += \
     neoncitytrack.h \
     obstacle.h \
     player.h \
+    gamewindow.h \
     settingsdialog.h \
     theme.h
 

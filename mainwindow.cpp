@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "gamewindow.h"
 #include <QSettings>
 #include<QGraphicsView>
 
@@ -42,21 +41,16 @@ void MainWindow::applyTheme(int themeIndex) {
 }
 
 void MainWindow::startGame(int trackId) {
-    QSettings settings("MyCompany", "RhythmRunner");
-    int themeIndex = settings.value("theme", 0).toInt();
-    GameWindow* gameWindow = new GameWindow(trackId, themeIndex, isFullScreen(), nullptr);
-    connect(gameWindow, &GameWindow::closed, this, [this, themeIndex]() {
-        applyTheme(themeIndex);
-        show();
-    });
-    gameWindow->show();
-    hide(); // Hide menu while game is active
+    scene->setTrack(trackId);
+    stackedWidget->setCurrentWidget(view);
+    view->setFixedSize(stackedWidget->size());
+    scene->startGame();
 }
 
 void MainWindow::returnToMenu() {
     stackedWidget->setCurrentWidget(menu);
 
-       scene->stopMusic();
+    scene->stopMusic();
 
 
     QSettings settings("MyCompany", "Geometry Dashlar");

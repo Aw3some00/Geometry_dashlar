@@ -20,11 +20,11 @@ public:
     void setTrack(int trackId);
     bool isOnPlatform = false;
     bool isGameOver = false;
-  //  void setupMusic();
+    //  void setupMusic();
     void stopMusic();
     QAudioOutput   audioOutput;
     void startMusic();
-        QSoundEffect* musicEffect;
+    QSoundEffect* musicEffect;
     QMediaPlayer *musicPlayer = nullptr;
 signals:
     void returnToMenu();
