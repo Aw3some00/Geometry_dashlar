@@ -4,6 +4,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QLabel>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle("Settings");
@@ -22,7 +24,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     displayModeComboBox = new QComboBox(this);
     displayModeComboBox->addItem("Windowed");
     displayModeComboBox->addItem("Fullscreen");
-    //displayModeComboBox->addItem("Borderless");
     int displayMode = settings.value("displayMode", 0).toInt();
     displayModeComboBox->setCurrentIndex(displayMode);
     layout->addWidget(displayModeComboBox);
@@ -31,15 +32,18 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
             this,
             &SettingsDialog::updateDisplayMode);
 
-    // Music Volume
-    QLabel* volumeLabel = new QLabel("Music Volume:", this);
-    layout->addWidget(volumeLabel);
-    volumeSlider = new QSlider(Qt::Horizontal, this);
-    volumeSlider->setRange(0, 100);
-    int volume = settings.value("volume", 50).toInt();
-    volumeSlider->setValue(volume);
-    layout->addWidget(volumeSlider);
-    connect(volumeSlider, &QSlider::valueChanged, this, &SettingsDialog::updateVolume);
+    // Mute/Unmute Button
+    QHBoxLayout* soundLayout = new QHBoxLayout();
+    QLabel* soundLabel = new QLabel("Sound:", this);
+    muteButton = new QPushButton("Mute", this);
+    muteButton->setCheckable(true);
+    bool isMuted = settings.value("muted", false).toBool();
+    muteButton->setChecked(isMuted);
+    muteButton->setText(isMuted ? "Unmute" : "Mute");
+    connect(muteButton, &QPushButton::clicked, this, &SettingsDialog::toggleMute);
+    soundLayout->addWidget(soundLabel);
+    soundLayout->addWidget(muteButton);
+    layout->addLayout(soundLayout);
 
     // Color Theme
     QLabel* themeLabel = new QLabel("Color Theme:", this);
@@ -51,9 +55,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     int themeIndex = settings.value("theme", 0).toInt();
     themeComboBox->setCurrentIndex(themeIndex);
     layout->addWidget(themeComboBox);
-    //connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateTheme);
-    connect(themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &SettingsDialog::updateTheme);
+    connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateTheme);
 
     // Spacer to push buttons to the bottom
     layout->addStretch();
@@ -98,11 +100,6 @@ void SettingsDialog::updateDisplayMode(int index) {
         mainWindow->showFullScreen();
         isFullScreen = true;
         break;
-   /* case 2: // Borderless
-        mainWindow->setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-        mainWindow->showMaximized();
-        isFullScreen = true;
-        break;*/
     default:
         mainWindow->showNormal();
         mainWindow->resize(1280, 720);
@@ -112,9 +109,11 @@ void SettingsDialog::updateDisplayMode(int index) {
     emit displayModeChanged(isFullScreen);
 }
 
-void SettingsDialog::updateVolume(int value) {
+void SettingsDialog::toggleMute() {
     QSettings settings("MyCompany", "RhythmRunner");
-    settings.setValue("volume", value);
+    bool isMuted = muteButton->isChecked();
+    settings.setValue("muted", isMuted);
+    muteButton->setText(isMuted ? "Unmute" : "Mute");
 }
 
 void SettingsDialog::updateTheme(int index) {
@@ -136,11 +135,12 @@ void SettingsDialog::resetSettings() {
     settings.clear();
 
     displayModeComboBox->setCurrentIndex(0);
-    volumeSlider->setValue(50);
+    muteButton->setChecked(false);
+    muteButton->setText("Mute");
     themeComboBox->setCurrentIndex(0);
 
     updateDisplayMode(0);
-    updateVolume(50);
+    toggleMute(); // Save the mute state
     updateTheme(0);
 
     QMessageBox::information(this, "Reset", "Settings have been reset to default.");
