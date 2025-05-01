@@ -286,21 +286,27 @@ void GameScene::update() {
 
 
 void GameScene::keyPressEvent(QKeyEvent *event) {
-    if (isGameOver) {
-        qDebug() << "Game is over, ignoring key press";
-        return;
-    }
-
-    if (event->key() == Qt::Key_Space) {
+    if (event->key() == Qt::Key_R) {
+        restartGame();
+        qDebug() << "Level restarted via 'R' key";
+        event->accept(); // Mark event as handled
+    } else if (event->key() == Qt::Key_Escape) {
+        emit returnToMenu();
+        qDebug() << "Exiting to menu via 'Esc' key";
+        event->accept(); // Mark event as handled
+    } else if (event->key() == Qt::Key_Space && !isGameOver) {
         player->jump();
         qDebug() << "Jump initiated, isOnPlatform:" << isOnPlatform;
+        event->accept(); // Mark event as handled
     } else {
         qDebug() << "Key press ignored: key=" << event->key()
-        << "isOnPlatform=" << isOnPlatform;
+                 << "isOnPlatform=" << isOnPlatform;
     }
-    QGraphicsScene::keyPressEvent(event);
+    // Only propagate unhandled events
+    if (!event->isAccepted()) {
+        QGraphicsScene::keyPressEvent(event);
+    }
 }
-
 void GameScene::restartGame() {
     for (auto item : items()) {
         if (dynamic_cast<Obstacle*>(item)) {
