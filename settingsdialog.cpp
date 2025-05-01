@@ -51,7 +51,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent) {
     int themeIndex = settings.value("theme", 0).toInt();
     themeComboBox->setCurrentIndex(themeIndex);
     layout->addWidget(themeComboBox);
-    connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateTheme);
+    //connect(themeComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateTheme);
+    connect(themeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &SettingsDialog::updateTheme);
 
     // Spacer to push buttons to the bottom
     layout->addStretch();

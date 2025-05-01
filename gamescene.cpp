@@ -4,48 +4,51 @@
 #include <QThread>
 #include <QMediaService>
 #include <QAudioOutput>
+#include <QAudioOutput>
 #include <iostream>
-void GameScene::startMusic() {
-    setupMusic();
-    if (musicPlayer) {
 
+void GameScene::startMusic() {
+    if (!musicPlayer) return;
+
+    if (musicPlayer->state() != QMediaPlayer::PlayingState) {
+        if (musicPlayer->media().isNull()) {
+            qDebug() << "Music not loaded!";
+            return;
+        }
         musicPlayer->play();
-        musicPlayer->setVolume(100);
         qDebug() << "Music started";
-    }
-    else{
-        std::cout << "Music Error ";
     }
 }
 
 void GameScene::stopMusic() {
-    setupMusic();
-    if (musicPlayer && musicPlayer->state() == QMediaPlayer::PlayingState) {
+    if (!musicPlayer) return;
+
+    if (musicPlayer->state() == QMediaPlayer::PlayingState) {
         musicPlayer->stop();
         qDebug() << "Music stopped";
     }
 }
-void GameScene::setupMusic() {
-    if (!musicPlayer) {
-        musicPlayer = new QMediaPlayer(this);
-
-        // Проверка доступности MP3
-        if (!musicPlayer->isAvailable()) {
-            qDebug() << "MP3 not supported, using WAV";
-            musicPlayer->setMedia(QUrl("qrc:/music//neoncity.wav"));
-        } else {
-            musicPlayer->setMedia(QUrl("qrc:/music/neoncity.mp3"));
-        }
-
-        musicPlayer->setVolume(100);
-    }
-}
-
-
 
 GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nullptr) {
 
-    startMusic();
+        musicPlayer = new QMediaPlayer(this);
+
+        // Настройка плеера
+        musicPlayer->setMedia(QMediaContent(QUrl("qrc:/neoncity.mp3")));
+        musicPlayer->setVolume(100); // Максимальная громкость (0-100)
+        if (!QFile(":/neoncity.mp3").exists()) {
+            qDebug() << "ERROR: Music file not found in resources!";
+            return;
+        }
+
+
+        // Обработка ошибок
+        connect(musicPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error),
+                [](QMediaPlayer::Error error) {
+                    qDebug() << "Music error:" << error;
+                });
+
+
     setSceneRect(0, 0, 800, 600);
 
     // Create player
@@ -95,7 +98,7 @@ GameScene::GameScene(QObject *parent) : QGraphicsScene(parent), currentTrack(nul
 
     gameTimer = new QTimer(this);
     connect(gameTimer, &QTimer::timeout, this, &GameScene::update);
-    setupMusic();
+
 }
 
 GameScene::~GameScene() {
@@ -331,6 +334,7 @@ void GameScene::startGame() {
     if (!gameTimer->isActive()) {
         gameTimer->start(1000 / 60);
     }
-    musicPlayer->play();
+    startMusic();
     qDebug() << "Game started, timer active:" << gameTimer->isActive();
 }
+

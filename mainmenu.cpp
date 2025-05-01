@@ -35,7 +35,7 @@ void MainMenu::setupUi() {
     mainLayout->addLayout(topLayout);
 
     // Title
-    titleLabel = new QLabel("Rhythm Runner", this);
+    titleLabel = new QLabel("Geometry Dashlar", this);
     titleLabel->setAlignment(Qt::AlignCenter);
     mainLayout->addWidget(titleLabel);
 
@@ -45,7 +45,7 @@ void MainMenu::setupUi() {
     mainLayout->addWidget(trackLabel);
 
     // Track buttons
-    track1Button = createStyledButton("Neon City", 0);
+    track1Button = createStyledButton("Baku Nation", 0);
     connect(track1Button, &QPushButton::clicked, this, [this]() { emit startGame(1); });
     mainLayout->addWidget(track1Button, 0, Qt::AlignCenter);
 

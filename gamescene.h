@@ -6,6 +6,7 @@
 #include <QTimer>
 #include "player.h"
 #include <QSoundEffect>
+#include <QAudioOutput>
 #include <QPushButton>
 #include "NeonCityTrack.h"
 #include <QGraphicsSceneMouseEvent>
@@ -19,13 +20,15 @@ public:
     void setTrack(int trackId);
     bool isOnPlatform = false;
     bool isGameOver = false;
-    void setupMusic();
+  //  void setupMusic();
     void stopMusic();
+    QAudioOutput   audioOutput;
     void startMusic();
         QSoundEffect* musicEffect;
     QMediaPlayer *musicPlayer = nullptr;
 signals:
     void returnToMenu();
+    void menuRequested();
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
