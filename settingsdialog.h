@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QComboBox>
-#include <QSlider>
+#include <QPushButton>
 #include "theme.h"
 
 class SettingsDialog : public QDialog {
@@ -14,7 +14,7 @@ public:
 
 private slots:
     void updateDisplayMode(int index);
-    void updateVolume(int value);
+    void toggleMute();
     void updateTheme(int index);
     void resetSettings();
 
@@ -24,8 +24,8 @@ signals:
 private:
     Theme* theme;
     QComboBox* displayModeComboBox;
-    QSlider* volumeSlider;
     QComboBox* themeComboBox;
+    QPushButton* muteButton; 
     QPushButton* resetButton;
     QPushButton* okButton;
 };
